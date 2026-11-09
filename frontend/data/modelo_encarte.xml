@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<produtos>
+  <produto><nome>Absorvente</nome><categoria>Higiene</categoria><preco>8,99</preco><estoque>20</estoque><imagem>absorvente.jpg</imagem><ativo>1</ativo></produto>
+</produtos>

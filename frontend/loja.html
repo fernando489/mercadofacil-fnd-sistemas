@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MercadoFácil — Loja</title>
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo-area">
+      <h1>MercadoFácil</h1>
+      <span>Seu negócio mais perto dos clientes.</span>
+    </div>
+    <nav>
+      <a href="admin.html" class="admin-link">⚙ Admin</a>
+      <button type="button" class="cart-badge" id="cart-counter" onclick="abrirCarrinho()">🛒 Meu carrinho (0)</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    
+    <!-- BANNER ROTATIVO COM PROPAGANDA E NOME EM DESTAQUE -->
+    <div class="carousel-container">
+      <button class="carousel-arrow prev" aria-label="Banner anterior" onclick="mudarSlide(-1)">&#10094;</button>
+      <button class="carousel-arrow next" aria-label="Próximo banner" onclick="mudarSlide(1)">&#10095;</button>
+
+      <div class="carousel-slides" id="carousel-slides">
+        <div class="slide">
+          <span class="slide-tag">Sua Loja Online</span>
+          <h2>Bem-vindo ao <span class="highlight">MercadoFácil</span></h2>
+          <p>Uma solução para minimercados, mercearias, condomínios, sobrados, lojas de doces e salgados e outros comércios.</p>
+          <button class="btn-slide" onclick="document.getElementById('produtos-container').scrollIntoView({behavior: 'smooth'})">Ver Produtos em Destaque ↓</button>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #b71c1c 0%, #4a148c 100%);">
+          <span class="slide-tag">Compras Rápidas e Práticas</span>
+          <h2>Qualidade e Rapidez com o <span class="highlight">MercadoFácil</span></h2>
+          <p>Explore produtos, confira preços e monte seu carrinho com praticidade, sem enfrentar filas.</p>
+          <button class="btn-slide" onclick="document.getElementById('produtos-container').scrollIntoView({behavior: 'smooth'})">Aproveitar Ofertas</button>
+        </div>
+
+        <div class="slide" style="background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);">
+          <span class="slide-tag">Tecnologia e Praticidade</span>
+          <h2>Compre online pelo site do <span class="highlight">MercadoFácil</span></h2>
+          <p>Escolha os produtos, ajuste as quantidades e simule seu pedido. Entrega ou retirada podem ser oferecidas na versão comercial.</p>
+          <button class="btn-slide" onclick="document.getElementById('produtos-container').scrollIntoView({behavior: 'smooth'})">Fazer Pedido</button>
+        </div>
+      </div>
+
+      <div class="carousel-dots">
+        <button type="button" class="dot active" aria-label="Banner 1" onclick="irParaSlide(0)"></button>
+        <button type="button" class="dot" aria-label="Banner 2" onclick="irParaSlide(1)"></button>
+        <button type="button" class="dot" aria-label="Banner 3" onclick="irParaSlide(2)"></button>
+      </div>
+    </div>
+
+    <!-- TÍTULO E FILTROS -->
+    <div style="margin-bottom: 20px;">
+      <h2 style="font-size: 20px; color: #1e293b; margin-bottom: 12px;">Catálogo de Produtos</h2>
+      <div class="filters-bar">
+        <input type="text" id="input-busca" aria-label="Buscar produto" placeholder="Buscar produto..." oninput="filtrarProdutos()">
+        <div class="categories" id="categorias"></div>
+      </div>
+    </div>
+
+    <!-- GRID DE PRODUTOS COM SELETOR DE QUANTIDADE -->
+    <div class="grid" id="produtos-container">
+      <!-- Renderizado via script -->
+    </div>
+  </div>
+
+  <div id="checkout" class="modal" hidden><form class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cart-title" onsubmit="finalizar(event)"><h2 id="cart-title">Meu carrinho</h2><div id="cart-items"></div><strong id="cart-total"></strong><input name="customer" aria-label="Seu nome" autocomplete="name" placeholder="Seu nome" required><input name="unit" aria-label="Endereço ou identificação da unidade" placeholder="Endereço / bloco / unidade" required><input name="phone" aria-label="Telefone ou WhatsApp" autocomplete="tel" placeholder="Telefone / WhatsApp" required><div style="display:flex;gap:8px"><button type="button" class="btn-buy" style="background:#64748b" onclick="fecharCarrinho()">Voltar</button><button class="btn-buy">Finalizar pedido</button></div></form></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/core/config.js"></script><script src="js/core/dados.js"></script>
+  <script src="js/core/base.js"></script>
+  <script>
+    // --- LÓGICA DO CARROSSEL ---
+    let slideAtual = 0;
+    const totalSlides = 3;
+    function iniciarAuto(){return matchMedia('(prefers-reduced-motion: reduce)').matches?null:setInterval(() => mudarSlide(1), 4500)}
+    let autoSlideInterval = iniciarAuto();
+
+    function irParaSlide(index) {
+      slideAtual = index;
+      atualizarCarrossel();
+    }
+
+    function mudarSlide(direcao) {
+      slideAtual = (slideAtual + direcao + totalSlides) % totalSlides;
+      atualizarCarrossel();
+    }
+
+    function atualizarCarrossel() {
+      const slides = document.getElementById('carousel-slides');
+      const dots = document.querySelectorAll('.dot');
+      
+      if (slides) {
+        slides.style.transform = `translateX(-${slideAtual * 100}%)`;
+      }
+      
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === slideAtual);
+      });
+
+      clearInterval(autoSlideInterval);
+      autoSlideInterval = iniciarAuto();
+    }
+
+    // --- CATÁLOGO DE PRODUTOS ---
+    const catalogoCompleto = () => getProducts().filter(p => p.active !== false).map(p => ({
+      id: String(p.id),
+      nome: p.name,
+      categoria: p.category,
+      preco: Number(p.price),
+      imagem: imgSrc(p.image),
+      estoque: Number(p.stock ?? 0)
+    }));
+
+    const CARRINHOKEY='mercado_demo_carrinho_v1';
+    function carregarCarrinho(){try{const c=JSON.parse(localStorage.getItem(CARRINHOKEY))||{},ps=getProducts(),o={};for(const id in c){const p=ps.find(x=>String(x.id)===id);if(p&&p.active!==false&&c[id].qtd>0&&c[id].qtd<=p.stock)o[id]={nome:p.name,preco:p.price,qtd:c[id].qtd}}return o}catch{return {}}}
+    function salvarCarrinho(){try{localStorage.setItem(CARRINHOKEY,JSON.stringify(carrinho))}catch{}}
+    function ajustarItem(id,d){const p=obterProdutos().find(x=>x.id===id),it=carrinho[id];if(!p||!it)return;const n=it.qtd+d;if(n<=0)delete carrinho[id];else if(n>p.estoque)return mostrarNotificacao('Estoque disponível: '+p.estoque);else it.qtd=n;atualizarCarrinho();abrirCarrinho()}
+    let carrinho = carregarCarrinho();
+
+    function obterProdutos() {
+      return catalogoCompleto();
+    }
+
+    function renderizarProdutos(lista) {
+      const container = document.getElementById('produtos-container');
+      if (!container) return;
+
+      if (lista.length === 0) {
+        container.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#64748b; padding: 30px;">Nenhum produto encontrado.</p>`;
+        return;
+      }
+
+      container.innerHTML = lista.map(p => `
+        <div class="card">
+          <img src="${esc(p.imagem)}" alt="${esc(p.nome)}" loading="lazy" onerror="this.onerror=null;this.style.opacity='.25'">
+          <div class="card-body">
+            <span class="badge">${esc(p.categoria)}</span>
+            <div class="title">${esc(p.nome)}</div>
+            <div class="price">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
+            
+            <!-- Controles de Quantidade -->
+            <div class="qty-container">
+              <button class="qty-btn" onclick="alterarQtd('${esc(p.id)}', -1)">-</button>
+              <input type="text" id="qtd-${esc(p.id)}" class="qty-input" value="1" readonly>
+              <button class="qty-btn" onclick="alterarQtd('${esc(p.id)}', 1)">+</button>
+            </div>
+
+            <button class="btn-buy" ${p.estoque<=0?'disabled':''} onclick="adicionarCarrinho('${esc(p.id)}')">${p.estoque<=0?'Esgotado':'Adicionar'}</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function alterarQtd(id, delta) {
+      const input = document.getElementById(`qtd-${id}`);
+      let atual = parseInt(input.value) + delta;
+      if (atual < 1) atual = 1;
+      input.value = atual;
+    }
+
+    let catAtual = 'Todos';
+    function aplicarFiltros() {
+      const termo = document.getElementById('input-busca').value.toLowerCase().trim();
+      renderizarProdutos(obterProdutos().filter(p =>
+        (catAtual === 'Todos' || p.categoria.toLowerCase() === catAtual.toLowerCase()) &&
+        p.nome.toLowerCase().includes(termo)));
+    }
+    function filtrarProdutos() { aplicarFiltros(); }
+    function filtrarCat(cat) { catAtual = cat; montarCategorias(); aplicarFiltros(); }
+    function montarCategorias() {
+      const cats = ['Todos', ...new Set(obterProdutos().map(p => p.categoria))];
+      if (!cats.includes(catAtual)) catAtual = 'Todos';
+      document.getElementById('categorias').innerHTML = cats.map(c =>
+        `<button class="cat-btn ${c === catAtual ? 'active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+    }
+    document.getElementById('categorias').addEventListener('click', e => {
+      const b = e.target.closest('[data-cat]'); if (b) filtrarCat(b.dataset.cat);
+    });
+
+    const totalItens=()=>Object.values(carrinho).reduce((s,i)=>s+i.qtd,0);
+    const atualizarCarrinho=()=>{salvarCarrinho();$('#cart-counter').innerText=`🛒 Meu carrinho (${totalItens()})`};
+    function adicionarCarrinho(id){const p=obterProdutos().find(x=>x.id===id),q=parseInt($('#qtd-'+id).value),at=carrinho[id]?.qtd||0;if(at+q>p.estoque)return mostrarNotificacao('Estoque disponível: '+p.estoque);carrinho[id]={nome:p.nome,preco:p.preco,qtd:at+q};atualizarCarrinho();mostrarNotificacao(`${q}x ${p.nome} adicionado(s)`)}
+    function abrirCarrinho(){const ids=Object.keys(carrinho);$('#cart-items').innerHTML=ids.length?ids.map(id=>`<div class="cart-row"><span><button type="button" class="qty-mini" aria-label="Diminuir quantidade" onclick="ajustarItem('${esc(id)}',-1)">−</button> ${carrinho[id].qtd}× ${esc(carrinho[id].nome)} <button type="button" class="qty-mini" aria-label="Aumentar quantidade" onclick="ajustarItem('${esc(id)}',1)">+</button></span><span>${money(carrinho[id].qtd*carrinho[id].preco)} <button type="button" onclick="removerItem('${id}')">✕</button></span></div>`).join(''):'<p>Seu carrinho está vazio.</p>';$('#cart-total').textContent='Total: '+money(ids.reduce((s,i)=>s+carrinho[i].qtd*carrinho[i].preco,0));const novo=$('#checkout').hidden;$('#checkout').hidden=false;if(novo)$('#checkout [name=customer]').focus()}
+    const fecharCarrinho=()=>{$('#checkout').hidden=true;$('#cart-counter').focus()};
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#checkout').hidden)fecharCarrinho()});
+    function removerItem(id){delete carrinho[id];atualizarCarrinho();abrirCarrinho()}
+    function finalizar(e){e.preventDefault();const ids=Object.keys(carrinho);if(!ids.length)return mostrarNotificacao('Carrinho vazio');const f=e.target.elements,prods=getProducts();
+      for(const id of ids)if((prods.find(p=>String(p.id)===id)?.stock??0)<carrinho[id].qtd)return mostrarNotificacao('Estoque insuficiente: '+carrinho[id].nome);
+      ids.forEach(id=>{prods.find(p=>String(p.id)===id).stock-=carrinho[id].qtd});
+      const orders=getOrders(),n=new Date(),items=ids.map(id=>({id:Number(id),name:carrinho[id].nome,qty:carrinho[id].qtd,price:carrinho[id].preco}));
+      const o={id:Math.max(0,...orders.map(x=>x.id))+1,created_at:n.toLocaleString('pt-BR'),day:hoje(n),customer:f.customer.value,unit:f.unit.value,phone:f.phone.value,items,total:items.reduce((s,i)=>s+i.qty*i.price,0),status:'Novo'};
+      orders.push(o);saveOrders(orders);saveProducts(prods);carrinho={};atualizarCarrinho();fecharCarrinho();e.target.reset();montarCategorias();filtrarProdutos();alert('Pedido demonstrativo #'+o.id+' registrado somente neste navegador. Total '+money(o.total))}
+
+    let temporizadorToast;
+    function mostrarNotificacao(mensagem) {
+      const toast = document.getElementById('toast');
+      toast.textContent = mensagem;
+      toast.classList.add('visivel');
+      clearTimeout(temporizadorToast);
+      temporizadorToast = setTimeout(() => toast.classList.remove('visivel'), 2000);
+    }
+    
+    montarCategorias();
+    aplicarFiltros();
+    atualizarCarrinho();
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+/* Responsividade, acessibilidade e elementos da demonstração */
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.demo-bar{background:#1e293b;color:#e2e8f0;font-size:13px;padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center}
+.demo-actions{display:flex;gap:8px;flex-wrap:wrap}
+.demo-bar button,.demo-bar a{background:transparent;color:#fff;border:1px solid #94a3b8;border-radius:6px;padding:5px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.demo-bar a{background:#16a34a;border-color:#16a34a}
+.site-footer{max-width:1200px;margin:30px auto 0;padding:18px 20px;border-top:1px solid #e2e8f0;font-size:13px;color:#64748b;text-align:center}
+button.cart-badge{border:0;font:inherit;font-weight:700;cursor:pointer}
+button.dot{border:0;padding:0}
+.qty-mini{border:1px solid #cbd5e1;background:#fff;border-radius:6px;width:26px;height:26px;cursor:pointer;font-weight:700}
+.cart-row{align-items:center}
+.secondary.danger{color:#b91c1c}
+.welcome-note{max-width:520px}
+@media (max-width:768px){
+  header{padding:12px 16px}.logo-area h1{font-size:18px}
+  .container{padding:0 14px;margin:18px auto}
+  .slide{padding:28px 22px;min-height:200px}.slide h2{font-size:24px}.slide p{font-size:14px}
+  .carousel-arrow{width:34px;height:34px;font-size:16px}
+  .filters-bar input{width:100%}
+  .categories{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}.cat-btn{white-space:nowrap}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card img{height:130px;padding:8px}.card-body{padding:11px}.title{min-height:36px;font-size:13px}
+  .order-head{flex-direction:column}.tabs button{flex:1 1 45%}
+  .shell{padding:0 12px}.stats{grid-template-columns:1fr 1fr}
+  .demo-bar{font-size:12px}
+}
+@media (max-width:380px){.stats{grid-template-columns:1fr}.logo-area span{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+/* ajustes após revisão visual no celular */
+.cart-badge{white-space:nowrap}
+@media (max-width:768px){
+  nav{gap:8px}.cart-badge{padding:7px 12px;font-size:13px}.admin-link{margin-right:0;font-size:12px}
+  .slide{padding:26px 50px}
+  .demo-bar{padding:6px 12px}.demo-bar>span:first-child{flex:1 1 100%}
+  .demo-actions{flex-wrap:wrap}.demo-bar button,.demo-bar a{padding:5px 8px;font-size:11px}
+}
+@media (max-width:400px){header{padding:10px 12px;gap:8px}.logo-area h1{font-size:16px}.cart-badge{padding:6px 10px;font-size:12px}nav{gap:6px}}
+
+/* Ajustes da apresentação comercial: cabeçalho, filtros e rodapé */
+body:not(.welcome-page) > header { position:sticky; justify-content:flex-end; min-height:94px; }
+body:not(.welcome-page) > header .logo-area { position:absolute; left:50%; transform:translateX(-50%); text-align:center; max-width:50%; }
+body:not(.welcome-page) > header .logo-area span { display:block; }
+body:not(.welcome-page) .filters-bar { display:flex; align-items:center; gap:12px; }
+body:not(.welcome-page) .filters-bar input { flex:0 1 280px; min-width:180px; }
+body:not(.welcome-page) .categories { flex:1 1 360px; }
+.site-footer { display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
+.site-footer a { color:#b90d28; }
+@media(max-width:768px) {
+ body:not(.welcome-page) > header { flex-direction:column; gap:10px; }
+ body:not(.welcome-page) > header .logo-area { position:static; transform:none; max-width:100%; }
+ body:not(.welcome-page) .filters-bar input { flex:1 1 100%; width:100%; }
+ body:not(.welcome-page) .categories { flex:1 1 100%; }
+}
